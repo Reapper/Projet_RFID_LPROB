@@ -39,7 +39,8 @@
  
 ### Cadence maximum des mesures :
   ```
-  La cadence des mesures n'étant donnée dans aucune datasheet, nous effectuerons des essais directement sur la carte afin d'essayer de la définir
+  La cadence des mesures n'étant donnée dans aucune datasheet, nous effectuerons des essais directement sur la carte 
+  afin d'essayer de la définir
   ```
  
 ### Latence pour la mesure:
@@ -64,5 +65,6 @@
  
 ### Tarifs et fournisseurs:
   ```
-  Prix de 11,90€ chez le fournisseur "Joy-It", seul dont nous avons trouvé le nom, ou 1€ chez des revendeurs chinois tiers
+  Prix de 11,90€ chez le fournisseur "Joy-It", seul dont nous avons trouvé le nom, ou 1€ chez des revendeurs chinois 
+  tiers
   ```
