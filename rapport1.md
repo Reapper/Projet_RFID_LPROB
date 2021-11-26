@@ -13,12 +13,13 @@
  
 ### Fonction du capteur : 
   ```
-  Détection et lecture d'informations de supports adaptés grâce à la technologie RFID 
+  Détection et lecture d'informations de supports adaptés (carte, badge, etc ...) grâce à la technologie RFID 
   ```
  
 ### Exemples d'utilisations :
   ```
-  Utilisation pour à des fins de sécurité, ex : contrôle d'identité à l'entrée de zones à accès restreint.
+  Utilisation pour à des fins de sécurité 
+  ex : contrôle d'identité à l'entrée de zones à accès restreint.
   ```
  
 ### tension d'alimentation du capteur :
@@ -33,8 +34,9 @@
  
 ### Distance minimum/maximum pour que le capteur puisse mesurer :
   ```
-  Distance MIN de détection: 0 cm 
-  Distance MAX de détection: 10 cm
+  Distance MIN de détection : 0 cm 
+  Distance MAX de détection : 10 cm
+  Distance Optimale de détection du modèle de la datasheet : 10 mm
   ```
  
 ### Cadence maximum des mesures :
@@ -50,7 +52,7 @@
  
 ### Communication via:
   ```
-  La communication s'effectue grâce à un bus de données SPI
+  La communication entre le capteur et l'Arduino s'effectue grâce à un bus de données SPI
   ```
  
 ### Librairie disponible pour Arduino:
@@ -60,7 +62,35 @@
  
 ### Programme d'exemple disponible pour Arduino:
   ```
-  La programme d'exemple fourni dans une des datasheet
+  La programme d'exemple fourni dans une des datasheet :
+  
+  #include <SPI.h> 
+  #include <MFRC522.h> 
+  #define RST_PIN 9 
+  #define SS_PIN 10 
+
+  MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+  void setup() {
+    /Serial.begin(9600);
+    wile (!serial);
+    SPI.begin();
+    mfrc522.PCD_Init();
+    mfrc522.PCD_DumpVersionToSerial();
+    Serial.println(F("Scan PICC to see UID, type, and data blocks ..."));
+
+ }
+
+ void loop() {
+  if(!mfrc522.PICC_IsNewCardPresent()){
+    return;
+  }
+  if(!mfrc522.PICC_IsNewCardSerial()){
+    return;
+  }
+  
+  mfrc522.PICC_DumpToSerial(&'mfrc522.uid));
+ }
   ```
  
 ### Tarifs et fournisseurs:
