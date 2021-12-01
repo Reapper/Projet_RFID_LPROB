@@ -28,4 +28,5 @@ void loop() {
  
  //Informationsabruf des RFID-Gerätes 
  mfrc522.PICC_DumpToSerial(&(mfrc522.uid)); 
+ 
 }
