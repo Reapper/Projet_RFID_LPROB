@@ -12,7 +12,7 @@ MFRC522 rfid(SS_PIN, RST_PIN);
 byte IDArray[10][4];
 
 // Etapes du programme
-char step = 0;
+char step = 10;
 
 void setup()
 {
@@ -42,6 +42,7 @@ void loop()
   //Attente de badge
   case 0:
 
+    // Si bouton Nouvelle Entrée est appuyé
     if (digitalRead(NewEntryBT))
       step = 10;
 
@@ -52,10 +53,6 @@ void loop()
     // Vérifier la présence d'un nouveau badge
     if (!rfid.PICC_ReadCardSerial())
       return;
-
-    // Si bouton Nouvelle Entrée est appuyé
-    if (digitalRead(NewEntryBT))
-      step = 2;
 
     Serial.println("CASE 0");
     step = 1;
@@ -80,11 +77,22 @@ void loop()
 
   // Ouverture porte
   case 2:
+    step = 0;
     Serial.println("CASE 2");
     break;
 
   // Enregistrement Badge
   case 10:
+
+    // Initialisé la boucle si aucun badge n'est présent
+    if (!rfid.PICC_IsNewCardPresent())
+      return;
+
+    // Vérifier la présence d'un nouveau badge
+    if (!rfid.PICC_ReadCardSerial())
+      return;
+    
+    // ENregistre le nouveau Badge
     for (byte j = 0; j < 10; j++)
     {
       for (byte i = 0; i < 4; i++)
@@ -92,6 +100,9 @@ void loop()
         IDArray[j][i] = rfid.uid.uidByte[i];
       }
     }
+
+    step = 0;
+    Serial.println("CASE 2");
     break;
   }
 
