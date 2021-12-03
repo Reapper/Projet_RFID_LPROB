@@ -32,15 +32,19 @@ void loop()
 
   switch (step)
   {
-  
+
   // Badge inconnu
   case -1:
     Serial.println("CASE -1: Badge unknow...");
     step = 0;
     break;
-    
+
   //Attente de badge
   case 0:
+
+    if (digitalRead(NewEntryBT))
+      step = 10;
+
     // Initialisé la boucle si aucun badge n'est présent
     if (!rfid.PICC_IsNewCardPresent())
       return;
@@ -57,8 +61,9 @@ void loop()
     step = 1;
     break;
 
+  // Test l'ID du badge (4 octets)
   case 1:
-    // Enregistrer l'ID du badge (4 octets)
+
     for (byte j = 0; j < 10; j++)
       for (byte i = 0; i < 4; i++)
       {
@@ -73,24 +78,29 @@ void loop()
     Serial.println("CASE 1");
     break;
 
+  // Ouverture porte
   case 2:
     Serial.println("CASE 2");
     break;
+
+  // Enregistrement Badge
+  case 10:
+    for (byte j = 0; j < 10; j++)
+    {
+      for (byte i = 0; i < 4; i++)
+      {
+        IDArray[j][i] = rfid.uid.uidByte[i];
+      }
+    }
+    break;
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
   /*
+
+
+
+
+
 for (byte j=0;i<10;j++)
       for (byte i = 0; i < 4; i++) 
       {
@@ -100,10 +110,6 @@ for (byte j=0;i<10;j++)
 
     break;
   }
-
-
-
-
 
   
   // Affichage de l'ID 
