@@ -1,6 +1,12 @@
 #include <SPI.h>     // SPI
 #include <MFRC522.h> // RFID
 
+// https://github.com/janelia-arduino/Vector
+#include <Vector.h> 
+
+// https://github.com/janelia-arduino/Array
+#include <Array.h>
+
 #define NewEntryBT 4
 #define SS_PIN 10
 #define RST_PIN 9
@@ -8,8 +14,9 @@
 // Déclaration
 MFRC522 rfid(SS_PIN, RST_PIN);
 
-// Tableau contentent l'ID
-byte IDArray[10][4];
+// Tableaux contenent les IDs
+Vector<Array<byte, 5>> IDArray;
+Array<byte, 5> CardCode;
 
 // Etapes du programme
 char step = 10;
@@ -41,6 +48,8 @@ void loop()
 
   //Attente de badge
   case 0:
+
+    CardCode = {};
 
     // Si bouton Nouvelle Entrée est appuyé
     if (digitalRead(NewEntryBT))
@@ -92,25 +101,18 @@ void loop()
     if (!rfid.PICC_ReadCardSerial())
       return;
     
-    // ENregistre le nouveau Badge
-    for (byte j = 0; j < 10; j++)
-    {
+    // Enregistre le nouveau Badge
       for (byte i = 0; i < 4; i++)
       {
-        IDArray[j][i] = rfid.uid.uidByte[i];
+        CardCode[i] = rfid.uid.uidByte[i];
       }
-    }
-
+      IDArray.push_back(CardCode);
     step = 0;
-    Serial.println("CASE 2");
+    Serial.println("CASE 10");
     break;
   }
 
   /*
-
-
-
-
 
 for (byte j=0;i<10;j++)
       for (byte i = 0; i < 4; i++) 
