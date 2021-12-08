@@ -2,7 +2,7 @@
 #include <MFRC522.h> // RFID
 
 // https://github.com/janelia-arduino/Vector
-#include <Vector.h> 
+#include <Vector.h>
 
 // https://github.com/janelia-arduino/Array
 #include <Array.h>
@@ -15,26 +15,31 @@
 MFRC522 rfid(SS_PIN, RST_PIN);
 
 // Tableaux contenent les IDs
-Vector<Array<byte, 5>> IDArray;
-Array<byte, 5> CardCode;
+//Vector<Array<byte, 4>> IDArray = {};
+Vector<byte> IDArray = {};
+Array<byte, 4> CardCode = {};
 
 // Etapes du programme
-char step = 10;
+char step = 0;
 
 void setup()
 {
   // Init RS232
   Serial.begin(9600);
+  Serial.println("IS ON !");
 
   // Init SPI bus
   SPI.begin();
 
   // Init MFRC522
   rfid.PCD_Init();
+
+  pinMode(NewEntryBT, INPUT_PULLUP);
 }
 
 void loop()
 {
+
   char testBytes = 0;
 
   switch (step)
@@ -51,9 +56,14 @@ void loop()
 
     CardCode = {};
 
+    //Serial.println(digitalRead(NewEntryBT));
+
     // Si bouton Nouvelle Entrée est appuyé
-    if (digitalRead(NewEntryBT))
+    if (!digitalRead(NewEntryBT))
+    {
+      Serial.println("NEW BADGE");
       step = 10;
+      }
 
     // Initialisé la boucle si aucun badge n'est présent
     if (!rfid.PICC_IsNewCardPresent())
@@ -70,12 +80,29 @@ void loop()
   // Test l'ID du badge (4 octets)
   case 1:
 
-    for (byte j = 0; j < 10; j++)
-      for (byte i = 0; i < 4; i++)
+    Serial.print("IDArray size = ");
+      Serial.println(IDArray.size());
+
+    Serial.print("CardCode size = ");
+      Serial.println(CardCode.size());
+
+    for (byte j = 0; j < IDArray.size(); j++)
+    {
+      
+      for (byte i = 0; i < CardCode.size(); i++)
       {
+        
         if (IDArray[j][i] != rfid.uid.uidByte[i])
           testBytes += 1;
+
+        Serial.print(" j = ");
+        Serial.print(j);
+        Serial.print(" IDArray = ");
+        Serial.print(IDArray[j][i]);
       }
+      Serial.print("\n TEST BYTES = ");
+      Serial.println(testBytes);
+    }
     if (testBytes == 0)
       step = 2;
     else
@@ -88,6 +115,7 @@ void loop()
   case 2:
     step = 0;
     Serial.println("CASE 2");
+    Serial.println("ACCESS GRANTED");
     break;
 
   // Enregistrement Badge
@@ -100,13 +128,24 @@ void loop()
     // Vérifier la présence d'un nouveau badge
     if (!rfid.PICC_ReadCardSerial())
       return;
-    
+
     // Enregistre le nouveau Badge
-      for (byte i = 0; i < 4; i++)
-      {
-        CardCode[i] = rfid.uid.uidByte[i];
-      }
-      IDArray.push_back(CardCode);
+    for (byte i = 0; i < 4; i++)
+    {
+      //CardCode[i] = rfid.uid.uidByte[i];
+      CardCode[i] = 23;
+      Serial.print(" i = ");
+      Serial.print(i);
+      Serial.print(" CardCode = ");
+      Serial.print(CardCode[i]);
+    }
+
+    Serial.println("");
+
+    byte tab[]={24,24,24,24};
+    //IDArray.push_back(CardCode);
+    IDArray.push_back(tab);
+    //IDArray.push_back(rfid.uid.uidByte);
     step = 0;
     Serial.println("CASE 10");
     break;
