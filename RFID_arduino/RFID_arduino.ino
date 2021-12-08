@@ -11,16 +11,37 @@
 #define SS_PIN 10
 #define RST_PIN 9
 
+#define IDArraySize 100
+#define NumBytesCard 4
+
 // Déclaration
 MFRC522 rfid(SS_PIN, RST_PIN);
 
 // Tableaux contenent les IDs
 //Vector<Array<byte, 4>> IDArray = {};
-Vector<byte> IDArray = {};
-Array<byte, 4> CardCode = {};
+
+//Vector<byte> IDArray = {};
+
+byte IDArray[IDArraySize];
+
+int lastCardIndex = 0;
 
 // Etapes du programme
 char step = 0;
+
+void displayArray()
+{
+  for (byte j = 0; j <= IDArraySize; j += 4)
+  {
+
+    for (byte i = 0; i < NumBytesCard; i++)
+    {
+      Serial.print(IDArray[j + i]);
+      Serial.print(" ");
+    }
+    Serial.println("");
+  }
+}
 
 void setup()
 {
@@ -40,8 +61,6 @@ void setup()
 void loop()
 {
 
-  char testBytes = 0;
-
   switch (step)
   {
 
@@ -49,12 +68,11 @@ void loop()
   case -1:
     Serial.println("CASE -1: Badge unknow...");
     step = 0;
+    delay(1000);
     break;
 
   //Attente de badge
   case 0:
-
-    CardCode = {};
 
     //Serial.println(digitalRead(NewEntryBT));
 
@@ -63,7 +81,7 @@ void loop()
     {
       Serial.println("NEW BADGE");
       step = 10;
-      }
+    }
 
     // Initialisé la boucle si aucun badge n'est présent
     if (!rfid.PICC_IsNewCardPresent())
@@ -79,33 +97,39 @@ void loop()
 
   // Test l'ID du badge (4 octets)
   case 1:
-
+    /*
     Serial.print("IDArray size = ");
-      Serial.println(IDArray.size());
+    Serial.println(IDArray.size());
 
     Serial.print("CardCode size = ");
-      Serial.println(CardCode.size());
-
-    for (byte j = 0; j < IDArray.size(); j++)
+    Serial.println(CardCode.size());
+*/
+    //displayArray();
+    for (byte j = 0; j < IDArraySize; j += 4)
     {
-      
-      for (byte i = 0; i < CardCode.size(); i++)
-      {
-        
-        if (IDArray[j][i] != rfid.uid.uidByte[i])
-          testBytes += 1;
 
-        Serial.print(" j = ");
-        Serial.print(j);
-        Serial.print(" IDArray = ");
-        Serial.print(IDArray[j][i]);
+      for (byte i = 0; i < NumBytesCard; i++)
+      { /*
+        Serial.print("j + i = ");
+        Serial.println(i);*/
+
+        if (IDArray[j + i] == rfid.uid.uidByte[i])
+        {
+          step = 2;
+          /*
+          Serial.print("INDEX : ");
+          Serial.println(i);
+          Serial.print(IDArray[j + i]);
+          Serial.print(" = ");
+          Serial.print(rfid.uid.uidByte[i]);*/
+        }/*
+        Serial.print("\nCARD : ");
+        Serial.println(j);*/
       }
-      Serial.print("\n TEST BYTES = ");
-      Serial.println(testBytes);
+      //Serial.println("");
     }
-    if (testBytes == 0)
-      step = 2;
-    else
+
+    if (step != 2)
       step = -1;
 
     Serial.println("CASE 1");
@@ -130,28 +154,24 @@ void loop()
       return;
 
     // Enregistre le nouveau Badge
-    for (byte i = 0; i < 4; i++)
+    Serial.print("lastCardIndex = ");
+    Serial.println(lastCardIndex);
+
+    for (byte i = 0; i < NumBytesCard; i++)
     {
-      //CardCode[i] = rfid.uid.uidByte[i];
-      CardCode[i] = 23;
-      Serial.print(" i = ");
-      Serial.print(i);
-      Serial.print(" CardCode = ");
-      Serial.print(CardCode[i]);
+      IDArray[i + lastCardIndex] = rfid.uid.uidByte[i];
     }
+    //displayArray();
+    lastCardIndex += 4;
 
-    Serial.println("");
-
-    byte tab[]={24,24,24,24};
-    //IDArray.push_back(CardCode);
-    IDArray.push_back(tab);
-    //IDArray.push_back(rfid.uid.uidByte);
     step = 0;
     Serial.println("CASE 10");
+    delay(1000);
     break;
   }
+}
 
-  /*
+/*
 
 for (byte j=0;i<10;j++)
       for (byte i = 0; i < 4; i++) 
@@ -177,8 +197,8 @@ for (byte j=0;i<10;j++)
   // Re-Init RFID
   rfid.PICC_HaltA(); // Halt PICC
   rfid.PCD_StopCrypto1(); // Stop encryption on PCD
-  */
-}
+  
+  }*/
 
 /*#include <MFRC522.h>
  
